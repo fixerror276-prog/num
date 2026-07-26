@@ -4,43 +4,42 @@ const axios = require("axios");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.json({
-    status: "active",
-    message: "Use /api/osint?query=9876543210"
+  res.status(200).json({
+    status: "running",
+    message: "API is working"
   });
 });
 
 app.get("/api/osint", async (req, res) => {
-  const { query } = req.query;
-
-  if (!query) {
-    return res.status(400).json({
-      success: false,
-      error: "Query parameter is required"
-    });
-  }
-
   try {
-    const response = await axios.get("https://darkxosint.site/", {
-      params: {
-        type: "numb",
-        key: "mynkbhai",
-        query: query
-      },
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json"
-      },
-      timeout: 15000
-    });
+    const query = req.query.query;
 
-    return res.status(200).json(response.data);
+    if (!query) {
+      return res.status(400).json({
+        error: "Query parameter missing"
+      });
+    }
+
+    const response = await axios.get(
+      `https://darkxosint.site/?type=numb&key=mynkbhai&query=${encodeURIComponent(query)}`,
+      {
+        timeout: 15000,
+        validateStatus: () => true
+      }
+    );
+
+    return res.status(response.status).json({
+      success: true,
+      backend_status: response.status,
+      backend_data: response.data
+    });
 
   } catch (err) {
-    return res.status(err.response?.status || 500).json({
+    return res.status(500).json({
       success: false,
-      error: err.message,
-      data: err.response?.data || null
+      message: err.message,
+      code: err.code,
+      stack: err.stack
     });
   }
 });
