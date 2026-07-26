@@ -1,9 +1,5 @@
 {
-  "name": "osint-api",
+  "name": "num-api",
   "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "axios": "^1.6.8",
-    "express": "^4.21.2"
-  }
+  "private": true
 }
